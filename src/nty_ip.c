@@ -172,7 +172,7 @@ uint8_t *IPOutputStandalone(nty_tcp_manager *tcp, uint8_t protocol,
 
 	unsigned char *haddr = GetDestinationHWaddr(daddr);
 	if (!haddr) {
-
+		return NULL;
 	}
 
 	struct iphdr *iph = (struct iphdr *)EthernetOutput(tcp, PROTO_IP, 0, haddr, payloadlen + IP_HEADER_LEN);

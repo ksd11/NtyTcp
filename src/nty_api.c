@@ -355,6 +355,7 @@ int nty_listen(int sockid, int backlog) {
 	listener->sockid = sockid;
 	listener->backlog = backlog;
 	listener->socket = &tcp->smap[sockid];
+	listener->s = (struct _nty_socket *)listener->socket; 
 
 	if (pthread_cond_init(&listener->accept_cond, NULL)) {
 		nty_trace_api("pthread_cond_init of ctx->accept_cond\n");
