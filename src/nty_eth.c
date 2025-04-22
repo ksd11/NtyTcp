@@ -184,7 +184,7 @@ void nty_tcp_setup(void) {
 	printf("nty_stack start\n");
 
 	//int ret = NTY_NIC_INIT(tctx, "netmap:eth0");
-	int ret = nty_nic_init(tctx, "netmap:eth1");
+	int ret = nty_nic_init(tctx, "netmap:ens256");
 	if (ret != 0) {
 		printf("init nic failed\n");
 		return ;

@@ -3,7 +3,7 @@ CC = gcc
 #CC = /usr/bin/gcc-5
 SUB_DIRS = app/ src/
 BIN = nty_stack
-FLAG = -lpthread -lhugetlbfs -lrt -g -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -Wno-unused-function -I $(ROOT_DIR)/include
+FLAG = -lpthread -lhugetlbfs -lrt -g -W -Wall -Wpointer-arith -Wno-unused-parameter -Werror -Wno-unused-function -Wno-address-of-packed-member -I $(ROOT_DIR)/include
 
 ROOT_DIR = $(shell pwd)
 BIN_DIR = $(ROOT_DIR)/bin
@@ -12,6 +12,7 @@ OBJS_DIR = $(ROOT_DIR)/obj
 CUR_SOURCE = ${wildcard *.c}
 CUR_OBJS = ${patsubst %.c, %.o, $(CUR_SOURCE)}
 
+# 导出变量到子makefile
 export CC OBJS_DIR BIN_DIR OBJS_DIR FLAG
 
 all : $(SUB_DIRS) $(CUR_OBJS) $(BIN_DIR)

@@ -106,33 +106,59 @@ unsigned char *GetDestinationHWaddr(uint32_t dip) {
 
 static inline unsigned short ip_fast_csum(const void *iph, unsigned int ihl)
 {
-	unsigned int sum;
-
-	__asm__ volatile(	"  movl (%1), %0\n"
-		"  subl $4, %2\n"
-		"  jbe 2f\n"
-		"  addl 4(%1), %0\n"
-		"  adcl 8(%1), %0\n"
-		"  adcl 12(%1), %0\n"
-		"1: adcl 16(%1), %0\n"
-		"  lea 4(%1), %1\n"
-		"  decl %2\n"
-		"  jne	1b\n"
-		"  adcl $0, %0\n"
-		"  movl %0, %2\n"
-		"  shrl $16, %0\n"
-		"  addw %w2, %w0\n"
-		"  adcl $0, %0\n"
-		"  notl %0\n"
-		"2:"
-	/* Since the input registers which are loaded with iph and ipl
-	   are modified, we must also specify them as outputs, or gcc
-	   will assume they contain their original values. */
-	: "=r" (sum), "=r" (iph), "=r" (ihl)
-	: "1" (iph), "2" (ihl)
-	: "memory");
-	return (unsigned short)sum;
+    const unsigned short *ip_h = (const unsigned short *)iph;
+    unsigned int sum = 0;
+    unsigned int nleft = ihl * 4; // ihl以4字节为单位，转换为总字节数
+    
+    // 按照2字节为单位加和
+    while (nleft > 1) {
+        sum += *ip_h++;
+        nleft -= 2;
+    }
+    
+    // 如果有奇数个字节，处理最后一个字节
+    if (nleft == 1) {
+        sum += *(unsigned char *)ip_h;
+    }
+    
+    // 将高16位的进位加到低16位
+    sum = (sum >> 16) + (sum & 0xffff);
+    sum += (sum >> 16); // 再次处理可能的进位
+    
+    // 取反得到校验和
+    return (unsigned short)(~sum);
 }
+
+
+// static inline unsigned short ip_fast_csum(const void *iph, unsigned int ihl)
+// {
+// 	unsigned int sum;
+
+// 	__asm__ volatile(	"  movl (%1), %0\n"
+// 		"  subl $4, %2\n"
+// 		"  jbe 2f\n"
+// 		"  addl 4(%1), %0\n"
+// 		"  adcl 8(%1), %0\n"
+// 		"  adcl 12(%1), %0\n"
+// 		"1: adcl 16(%1), %0\n"
+// 		"  lea 4(%1), %1\n"
+// 		"  decl %2\n"
+// 		"  jne	1b\n"
+// 		"  adcl $0, %0\n"
+// 		"  movl %0, %2\n"
+// 		"  shrl $16, %0\n"
+// 		"  addw %w2, %w0\n"
+// 		"  adcl $0, %0\n"
+// 		"  notl %0\n"
+// 		"2:"
+// 	/* Since the input registers which are loaded with iph and ipl
+// 	   are modified, we must also specify them as outputs, or gcc
+// 	   will assume they contain their original values. */
+// 	: "=r" (sum), "=r" (iph), "=r" (ihl)
+// 	: "1" (iph), "2" (ihl)
+// 	: "memory");
+// 	return (unsigned short)sum;
+// }
 
 
 
