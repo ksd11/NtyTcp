@@ -91,7 +91,7 @@ typedef struct _nty_arp_manager {
 	pthread_mutex_t lock;
 } nty_arp_manager;
 
-nty_arp_manager global_arp_manager;
+nty_arp_manager global_arp_manager; // 全局arp信息表
 nty_arp_table *global_arp_table = NULL;
 
 
@@ -163,6 +163,7 @@ void nty_arp_pkt(struct arppkt *arp, struct arppkt *arp_rt, char *hmac) {
 
 extern nty_tcp_manager *nty_get_tcp_manager(void);
 
+// 处理arp request
 int nty_arp_process_request(struct arphdr *arph) {
 
 	unsigned char *tmp = GetDestinationHWaddr(arph->sip);
@@ -176,6 +177,7 @@ int nty_arp_process_request(struct arphdr *arph) {
 	return 0;
 }
 
+// 处理arp reply
 int nty_arp_process_reply(struct arphdr *arph) {
 	unsigned char *tmp = GetDestinationHWaddr(arph->sip);
 	if (!tmp) {
@@ -324,7 +326,7 @@ int nty_arp_process(nty_nic_context *ctx, unsigned char *stream) {
 
 	struct arppkt *arp = (struct arppkt*)stream;
 	
-	if (arp->arp.dip == inet_addr(NTY_SELF_IP)) {
+	if (arp->arp.dip == inet_addr(NTY_SELF_IP)) { // 如果是发给当前网卡的
 #if 0
 		nty_arp_pkt(arp, &arp_rt, NTY_SELF_MAC);
 		NTY_NIC_WRITE(ctx, &arp_rt, sizeof(struct arppkt));
@@ -332,11 +334,11 @@ int nty_arp_process(nty_nic_context *ctx, unsigned char *stream) {
 
 		switch (ntohs(arp->arp.oper)) {
 			case arp_op_request : {
-				nty_arp_process_request(&arp->arp);
+				nty_arp_process_request(&arp->arp); // 当前是request arp
 				break;
 			}
 			case arp_op_reply : {
-				nty_arp_process_reply(&arp->arp);
+				nty_arp_process_reply(&arp->arp); // 当前是response arp
 				break;
 			}
 		}

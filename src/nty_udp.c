@@ -60,7 +60,7 @@
 #include "nty_nic.h"
 
 
-
+// 得到处理后的response包，就是将相应字段置换，然后数据不变
 void nty_udp_pkt(struct udppkt *udp, struct udppkt *udp_rt) {
 	memcpy(udp_rt, udp, sizeof(struct udppkt));
 

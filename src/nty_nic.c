@@ -103,7 +103,9 @@ int nty_nic_write(nty_nic_context *ctx, const void *stream, int length) {
 	if (stream == NULL) return -2;
 	if (length == 0) return 0;
 
-	nm_inject(ctx->nmr, stream, length);
+	if(nm_inject(ctx->nmr, stream, length) == 0){
+		printf("nm_inject error...%s\n", strerror(errno));
+	}
 
 	return 0;
 }

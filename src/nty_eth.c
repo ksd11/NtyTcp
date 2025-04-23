@@ -140,7 +140,7 @@ static void *nty_tcp_run(void *arg) {
 
 		struct pollfd pfd = {0};
 		pfd.fd = ctx->nmr->fd;
-		pfd.events = POLLIN | POLLOUT;
+		pfd.events = POLLIN | POLLOUT; // 监听读写
 		
 		int ret = poll(&pfd, 1, -1);
 		if (ret < 0) continue;
@@ -165,12 +165,12 @@ static void *nty_tcp_run(void *arg) {
 		if (pfd.revents & POLLIN) {
 
 			unsigned char *stream = NULL;
-			nty_nic_read(ctx, &stream);
+			nty_nic_read(ctx, &stream); // 接受数据包
 			nty_eth_process(ctx, stream);
 
 		} else if (pfd.revents & POLLOUT) {
 
-			nty_nic_send_pkts(ctx, 0);
+			nty_nic_send_pkts(ctx, 0); // 发送数据包
 		} 
 				
 	}
